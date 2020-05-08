@@ -1,0 +1,29 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: secure_file
+  displayName: Secure File Example
+  jobs:
+  - job: auth
+    displayName: Secure File Auth
+    steps:
+    - task: DownloadSecureFile@1
+      name: serviceAccount
+      inputs:
+        secureFile: 'azure-deployments-example.json'
+    - task: GoogleCloudSdkInstaller@0
+      inputs:
+        version: '291.0.0'
+    - task: GcloudRunner@0
+      inputs:
+        command: 'auth activate-service-account'
+        arguments: '--key-file $(serviceAccount.secureFilePath)'
+      displayName: 'gcloud auth activate-service-account'
+    - task: GcloudRunner@0
+      inputs:
+        command: 'auth list'
+      displayName: 'gcloud auth list'
