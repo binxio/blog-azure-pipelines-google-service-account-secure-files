@@ -27,3 +27,28 @@ stages:
       inputs:
         command: 'auth list'
       displayName: 'gcloud auth list'
+
+- stage: variable_group
+  displayName: Variable Group Example
+  jobs:
+  - job: auth
+    displayName: Variable Group Auth
+    variables:
+    - group: azure-deployments-example
+    steps:
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: 'echo $(ServiceAccountKey) | base64 -d > _key.json'
+    - task: GoogleCloudSdkInstaller@0
+      inputs:
+        version: '291.0.0'
+    - task: GcloudRunner@0
+      inputs:
+        command: 'auth activate-service-account'
+        arguments: '--key-file _key.json'
+      displayName: 'gcloud auth activate-service-account'
+    - task: GcloudRunner@0
+      inputs:
+        command: 'auth list'
+      displayName: 'gcloud auth list'
